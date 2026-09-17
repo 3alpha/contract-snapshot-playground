@@ -1,0 +1,28 @@
+[package]
+name = "reth-contract-snapshot"
+version.workspace = true
+edition.workspace = true
+rust-version.workspace = true
+license.workspace = true
+description = "Read-only, root-pinned contract state snapshots from a live Reth datadir"
+
+[dependencies]
+alloy-evm.workspace = true
+alloy-primitives.workspace = true
+# Keep Alloy's proc-macro crates aligned with the versions in Reth's lockfile.
+alloy-sol-macro = "=1.6.1"
+alloy-sol-macro-expander = "=1.6.1"
+alloy-sol-macro-input = "=1.6.1"
+clap = { version = "4.5", features = ["derive"] }
+reth-chainspec = { git = "https://github.com/paradigmxyz/reth.git", rev = "68877d5fd7d146ef070bbe7dbabbe1097ea1da62" }
+reth-db = { git = "https://github.com/paradigmxyz/reth.git", rev = "68877d5fd7d146ef070bbe7dbabbe1097ea1da62", features = ["mdbx"] }
+reth-ethereum-engine-primitives = { git = "https://github.com/paradigmxyz/reth.git", rev = "68877d5fd7d146ef070bbe7dbabbe1097ea1da62" }
+reth-ethereum-primitives = { git = "https://github.com/paradigmxyz/reth.git", rev = "68877d5fd7d146ef070bbe7dbabbe1097ea1da62" }
+reth-node-types = { git = "https://github.com/paradigmxyz/reth.git", rev = "68877d5fd7d146ef070bbe7dbabbe1097ea1da62" }
+reth-provider = { git = "https://github.com/paradigmxyz/reth.git", rev = "68877d5fd7d146ef070bbe7dbabbe1097ea1da62" }
+reth-storage-api = { git = "https://github.com/paradigmxyz/reth.git", rev = "68877d5fd7d146ef070bbe7dbabbe1097ea1da62" }
+reth-tasks = { git = "https://github.com/paradigmxyz/reth.git", rev = "68877d5fd7d146ef070bbe7dbabbe1097ea1da62" }
+revm = { workspace = true, features = ["std"] }
+serde_json.workspace = true
+snapshot-format.workspace = true
+tempfile = "3"

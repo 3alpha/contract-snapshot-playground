@@ -1,0 +1,5 @@
+/target/
+*.json.tmp
+crates/snapshot-web/ui/dist/
+crates/snapshot-web/ui/node_modules/
+crates/snapshot-web/ui/src/generated/

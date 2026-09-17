@@ -1,0 +1,12 @@
+{
+  "extends": "./tsconfig.json",
+  "compilerOptions": {
+    "lib": ["ES2022", "WebWorker", "ESNext.Disposable"]
+  },
+  "include": [
+    "src/generated/snapshot_web/snapshot_web.d.ts",
+    "src/types.ts",
+    "src/worker/dispatch.ts",
+    "src/worker/executor.worker.ts"
+  ]
+}

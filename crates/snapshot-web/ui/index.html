@@ -1,0 +1,103 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta name="color-scheme" content="dark" />
+    <title>eth_call Sandbox</title>
+  </head>
+  <body>
+    <main id="app">
+      <header class="toolbar">
+        <div class="brand"><span class="brand-icon" aria-hidden="true">&gt;_</span><h1>eth_call <span>Sandbox</span></h1><span class="tag">SNAPSHOT WORKSPACE</span></div>
+        <div class="privacy"><span></span>Local execution</div>
+      </header>
+      <div class="workspace-heading"><div><h2>Contract workbench</h2><p>Inspect snapshot state. Compose a call. Decode the result.</p></div></div>
+      <details class="guide">
+        <summary>Quick start <span>Snapshot → optional ABI → execute call</span></summary>
+        <div class="guide-content">
+          <p>Export snapshot v1 JSON batches with <code>reth-contract-snapshot</code>, then import accounts from a shared anchor block. Attach an ABI for named functions, or use raw calldata directly.</p>
+          <p>Grab a ready-made example from the <a href="https://github.com/3alpha/contract-snapshot-playground/tree/master/examples" target="_blank" rel="noopener noreferrer">examples folder</a> and drop its snapshot JSON into the Snapshot state panel. Follow the example's README for ABI files and calls to try.</p>
+          <p>Calls run locally in REVM / WebAssembly without changing snapshot state. Snapshots stay in this tab; validated ABIs are saved in this browser.</p>
+        </div>
+      </details>
+      <section class="workspace-grid">
+        <aside class="resources" aria-label="Workspace resources">
+        <article class="panel snapshots-panel">
+          <div class="panel-heading">
+            <div><span class="step">01</span><h2>Snapshot state</h2></div>
+            <span id="account-count" class="count">0 loaded</span>
+          </div>
+          <label id="drop-zone" class="drop-zone" for="snapshot-files">
+            <input id="snapshot-files" type="file" accept="application/json,.json" multiple />
+            <span class="drop-icon">↓</span>
+            <strong>Import snapshots</strong>
+            <span class="browse-link">Choose files or drop them here</span>
+            <small>Snapshot v1 · .json · multiple files supported</small>
+          </label>
+          <p class="panel-description">Need a snapshot? Browse the <a href="https://github.com/3alpha/contract-snapshot-playground/tree/master/examples" target="_blank" rel="noopener noreferrer">examples folder ↗</a>.</p>
+          <p id="snapshot-status" class="status" aria-live="polite"></p>
+          <div id="accounts" class="account-list"></div>
+          <p id="accounts-empty" class="empty-state">No accounts loaded.<br />Import a snapshot to select a call target.</p>
+        </article>
+
+        <article class="panel abi-panel">
+          <div class="panel-heading"><div><span class="step">02</span><h2>Contract ABI</h2></div><span id="abi-saved-count" class="count">0 saved</span></div>
+          <p class="panel-description">Optional for raw calls. Saved per contract in this browser.</p>
+          <label class="abi-address-label">Contract address<select id="abi-address">
+            <option value="">— Pick a saved contract —</option>
+            <option value="__new__">+ Add new address…</option>
+          </select></label>
+          <label id="abi-address-new-row" class="abi-address-new" hidden>New contract address<input id="abi-address-new" spellcheck="false" placeholder="0x…" /></label>
+          <label class="file-button">Choose ABI JSON<input id="abi-file" type="file" accept="application/json,.json" /></label>
+          <label>ABI JSON<textarea id="abi-json" rows="5" spellcheck="false" placeholder='[{"type":"function",…}]'></textarea></label>
+          <div class="button-row">
+            <button id="save-abi" class="primary" type="button">Save ABI</button>
+            <button id="remove-abi" class="secondary danger" type="button">Remove</button>
+          </div>
+          <p id="abi-status" class="status" aria-live="polite"></p>
+        </article>
+
+        </aside>
+        <div class="execution-workspace">
+        <article class="panel call-panel">
+          <div class="panel-heading"><div><span class="step">03</span><h2>Compose call</h2></div></div>
+          <div class="form-grid">
+            <label class="target-field">Target contract<select id="target"><option value="">Load a snapshot first</option></select></label>
+            <label>Caller<input id="caller" value="0x0000000000000000000000000000000000000000" spellcheck="false" /></label>
+            <label>Value (wei)<input id="value" value="0" spellcheck="false" /></label>
+            <label>Gas limit<input id="gas-limit" type="number" min="1" max="16777216" value="16777216" /></label>
+          </div>
+          <div class="mode-row" role="group" aria-label="Calldata mode">
+            <button id="abi-mode" aria-pressed="true" class="mode active" type="button">ABI form</button>
+            <button id="raw-mode" aria-pressed="false" class="mode" type="button">Raw calldata</button>
+          </div>
+          <div id="abi-call-fields">
+            <label>Function<select id="function"><option value="">Add an ABI for this target</option></select></label>
+            <div id="arguments" class="argument-list"></div>
+          </div>
+          <div id="raw-call-fields" hidden>
+            <label>Calldata<textarea id="calldata" rows="4" spellcheck="false">0x</textarea></label>
+          </div>
+          <div class="execute-row"><button id="execute" class="primary execute" type="button" disabled>Run call <span aria-hidden="true">↵</span></button><span class="shortcut">Ctrl / ⌘ + Enter</span></div>
+          <p id="call-status" class="status" aria-live="polite">Import a snapshot to get started.</p>
+        </article>
+
+        <article class="panel result-panel">
+          <div class="panel-heading"><div><span class="step">04</span><h2>Execution result</h2></div><span id="result-badge" class="result-badge idle">Idle</span></div>
+          <dl class="metrics"><div><dt>Gas used</dt><dd id="gas-used">—</dd></div><div><dt>Decoded</dt><dd id="decoded-count">—</dd></div></dl>
+          <section class="output-section" aria-labelledby="decoded-heading"><h3 id="decoded-heading">Decoded output / reason</h3><div id="result-decoded" class="decoded-output"><p class="decoded-placeholder">No execution yet. Run a call to inspect return values, gas usage, or a revert reason.</p></div></section>
+          <section class="output-section" aria-labelledby="calldata-heading"><div class="output-heading"><h3 id="calldata-heading">Calldata</h3><button class="copy-button secondary" data-copy="result-calldata" type="button">Copy</button></div><pre id="result-calldata" tabindex="0">0x</pre></section>
+          <section class="output-section" aria-labelledby="output-heading"><div class="output-heading"><h3 id="output-heading">Raw output</h3><button class="copy-button secondary" data-copy="result-output" type="button">Copy</button></div><pre id="result-output" tabindex="0">0x</pre></section>
+          <p id="copy-status" class="status" aria-live="polite"></p>
+        </article>
+        </div>
+      </section>
+      <footer>
+        Snapshots live only in the Web Worker for this tab. Only validated ABI text is persisted.
+        <a class="repo-link" href="https://github.com/3alpha/contract-snapshot-playground" target="_blank" rel="noopener noreferrer">View source on GitHub ↗</a>
+      </footer>
+    </main>
+    <script type="module" src="/src/main.ts"></script>
+  </body>
+</html>
